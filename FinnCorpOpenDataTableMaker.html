@@ -25,15 +25,30 @@ table tr:nth-child(even) {
 <body>
 
 <!-- Varataan alue jolle data tuodaan -->
-<div id="datakentta"></div>
+<div id="datakentta" gravity="center"></div>
+
+<!-- Luodaan nappulat seuraaviin tulosten selaamista varten -->
+<div id="kontrollit">
+<button id="edellinen" onclick="btn_prevResults()"> Edelliset tulokset </button>
+<button id="seuraava" onclick="btn_nextResults()"> Seuraavat tulokset </button>
+</div>
 
 <!-- Alla skripti jolla haetaan tiedot palvelusta -->
 <script>
     
 //Haetaan URL:in takaa JSON muodossa oleva vastaus
 var xmlhttp = new XMLHttpRequest();
-var url = "http://avoindata.prh.fi:80/tr/v1?totalResults=false&maxResults=10&resultsFrom=0&companyRegistrationFrom=2015-05-01";
+    
+// uusi url generaattori   
+var totalResults= false;    
+var resultsFromCount = 0;
+var maxResults = 20;
+var companyRegistrationFrom = "2015-05-01";
+var compantRegistrationTo = "2015-05-31";
+    
+var url = "http://avoindata.prh.fi:80/tr/v1?totalResults="+totalResults+"&maxResults="+maxResults+"&resultsFrom="+resultsFromCount+"&companyRegistrationFrom="+companyRegistrationFrom+"&companyRegistrationTo="+compantRegistrationTo;    
 
+//tarkastetaan että saadaan vastaus palvelusta
 xmlhttp.onreadystatechange=function() {
     if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
         taulukkoKone(xmlhttp.responseText);
@@ -46,15 +61,13 @@ xmlhttp.send();
 function taulukkoKone(response) {
     var arr = JSON.parse(response).results;
     var i;
-    var out = "<table>";
-
+    var out = "<table> <th>Y-tunnus</th><th>Nimi</th> <th>Yritysmuoto</th><th>Rekisterointi pvm</th>";
+ 
     for(i = 0; i < arr.length; i++) {
         out += "<tr><td>" +
         arr[i].businessId +
         "</td><td>" +
         arr[i].name +
-        "</td><td>" +
-        arr[i].registrationDate +
         "</td><td>" +
         arr[i].companyForm +
         "</td><td>" +
@@ -64,6 +77,14 @@ function taulukkoKone(response) {
     out += "</table>";
     document.getElementById("datakentta").innerHTML = out;
 }
+function btn_nextResults() {
+alert("seuraava nappulaa painettu");
+}
+function btn_prevResults() {
+alert("edellinen nappulaa painettu");    
+}
+  
+    
 </script> 
 </body>
 </html>
