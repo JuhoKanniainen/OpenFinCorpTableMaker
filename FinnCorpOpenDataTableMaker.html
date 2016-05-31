@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<style>
+h1 {
+    border-bottom: 3px solid #cc9900;
+    color: #996600;
+    font-size: 30px;
+}
+table, th , td {
+    border: 1px solid grey;
+    border-collapse: collapse;
+    padding: 5px;
+}
+table tr:nth-child(odd) {
+    background-color: #f1f1f1;
+}
+table tr:nth-child(even) {
+    background-color: #ffffff;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Varataan alue jolle data tuodaan -->
+<div id="datakentta"></div>
+
+<!-- Alla skripti jolla haetaan tiedot palvelusta -->
+<script>
+    
+//Haetaan URL:in takaa JSON muodossa oleva vastaus
+var xmlhttp = new XMLHttpRequest();
+var url = "http://avoindata.prh.fi:80/tr/v1?totalResults=false&maxResults=10&resultsFrom=0&companyRegistrationFrom=2015-05-01";
+
+xmlhttp.onreadystatechange=function() {
+    if (xmlhttp.readyState == 4 && xmlhttp.status == 200) {
+        taulukkoKone(xmlhttp.responseText);
+    }
+}
+xmlhttp.open("GET", url, true);
+xmlhttp.send();
+    
+// taulukkoKone tekee tiedoista taulukon
+function taulukkoKone(response) {
+    var arr = JSON.parse(response).results;
+    var i;
+    var out = "<table>";
+
+    for(i = 0; i < arr.length; i++) {
+        out += "<tr><td>" +
+        arr[i].businessId +
+        "</td><td>" +
+        arr[i].name +
+        "</td><td>" +
+        arr[i].registrationDate +
+        "</td><td>" +
+        arr[i].companyForm +
+        "</td><td>" +
+        arr[i].registrationDate +
+        "</td></tr>";
+    }
+    out += "</table>";
+    document.getElementById("datakentta").innerHTML = out;
+}
+</script> 
+</body>
+</html>
