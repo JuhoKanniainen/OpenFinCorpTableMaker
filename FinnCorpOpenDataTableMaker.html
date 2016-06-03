@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-
+<!--Tämän dokumentti yhdistyy Kaupparekisterin avoimeen dataan ja hakee sieltä aina kuluvan kuukauden aikana rekisteröityneet yritykset.  -->
 <head>
 <style>
 h1 {
@@ -30,13 +30,33 @@ table tr:nth-child(even) {
 <!-- Luodaan nappulat seuraaviin tulosten selaamista varten -->
 <div id="kontrollit">
 <button id="edellinen" onclick="btn_prevResults()"> Edelliset tulokset </button>
-<button id="seuraava" onclick="btn_nextResults(xmlhttp.responseText)"> Seuraavat tulokset </button>
+<button id="seuraava" onclick="btn_nextResults(xmlhttp.responseText)"> Seuraavat tulokset </button>   
 </div>
 
 <!-- Alla skripti jolla haetaan tiedot palvelusta -->
 <script>
-// Määritetään globaalit muuttujat
-var resultsFromCount = 0;    
+
+// Määritetään globaalit muuttujat koneellista manipulointia varten
+var resultsFromCount = 0;
+    
+// Manipuloimalla maxResults arvoa voi kontrolloida montako tietuetta näytetään kerralla.    
+var maxResults = 20;    
+    
+//Alustetaan aika jotta sovellus pysyy automaattisesti ajan tasalla.
+var d = new Date();   
+var kuukausi = d.getMonth() + 1;
+var paiva = d.getDate();
+var vuosi = d.getFullYear();
+
+//Pidetään huoli siitä että formaatti pysyy kunnossa    
+if(kuukausi <= 9){
+kuukausi = "0"+kuukausi;
+    
+}
+if(paiva <=9){
+paiva = "0"+paiva;    
+}    
+    
 //Haetaan URL:in takaa JSON muodossa oleva vastaus
 var xmlhttp = new XMLHttpRequest();  
 
@@ -74,15 +94,15 @@ function taulukkoKone(response) {
 // Funktiot sivun alalaidan nappuloille
     
 function btn_nextResults(response) {  
-resultsFromCount = resultsFromCount + 20;    
+resultsFromCount = resultsFromCount + maxResults;    
 taulukkoKone(xmlhttp.responseText);
 xmlhttp.open("GET", urlGenerator(), true);
 xmlhttp.send();   
   
 }
 function btn_prevResults() {
-if (resultsFromCount >= 20){   
-resultsFromCount = resultsFromCount - 20;
+if (resultsFromCount >= maxResults){   
+resultsFromCount = resultsFromCount - maxResults;
 taulukkoKone(xmlhttp.responseText);
 xmlhttp.open("GET", urlGenerator(), true);
 xmlhttp.send();    
@@ -96,13 +116,13 @@ alert("Olet ensimmaisella sivulla");
 //URL generaattori     
 function urlGenerator(url){ 
 var totalResults= false;    
-var maxResults = 20;
-var companyRegistrationFrom = "2016-05-01";
-var companyRegistrationTo = "2016-05-31";    
+var companyRegistrationFrom = vuosi+"-"+kuukausi+"-01";
+var companyRegistrationTo = vuosi+"-"+kuukausi+"-"+paiva;    
 var url = "http://avoindata.prh.fi:80/tr/v1?totalResults="+totalResults+"&maxResults="+maxResults+"&resultsFrom="+resultsFromCount+"&companyRegistrationFrom="+companyRegistrationFrom+"&companyRegistrationTo="+companyRegistrationTo;
 return url;    
 }
-        
+
+    
 </script> 
 </body>
 </html>
