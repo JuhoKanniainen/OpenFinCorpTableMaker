@@ -30,23 +30,15 @@ table tr:nth-child(even) {
 <!-- Luodaan nappulat seuraaviin tulosten selaamista varten -->
 <div id="kontrollit">
 <button id="edellinen" onclick="btn_prevResults()"> Edelliset tulokset </button>
-<button id="seuraava" onclick="btn_nextResults()"> Seuraavat tulokset </button>
+<button id="seuraava" onclick="btn_nextResults(xmlhttp.responseText)"> Seuraavat tulokset </button>
 </div>
 
 <!-- Alla skripti jolla haetaan tiedot palvelusta -->
 <script>
-    
+// Määritetään globaalit muuttujat
+var resultsFromCount = 0;    
 //Haetaan URL:in takaa JSON muodossa oleva vastaus
-var xmlhttp = new XMLHttpRequest();
-    
-// uusi url generaattori   
-var totalResults= false;    
-var resultsFromCount = 0;
-var maxResults = 20;
-var companyRegistrationFrom = "2015-05-01";
-var compantRegistrationTo = "2015-05-31";
-    
-var url = "http://avoindata.prh.fi:80/tr/v1?totalResults="+totalResults+"&maxResults="+maxResults+"&resultsFrom="+resultsFromCount+"&companyRegistrationFrom="+companyRegistrationFrom+"&companyRegistrationTo="+compantRegistrationTo;    
+var xmlhttp = new XMLHttpRequest();  
 
 //tarkastetaan että saadaan vastaus palvelusta
 xmlhttp.onreadystatechange=function() {
@@ -54,9 +46,10 @@ xmlhttp.onreadystatechange=function() {
         taulukkoKone(xmlhttp.responseText);
     }
 }
-xmlhttp.open("GET", url, true);
+
+xmlhttp.open("GET", urlGenerator(), true);
 xmlhttp.send();
-    
+
 // taulukkoKone tekee tiedoista taulukon
 function taulukkoKone(response) {
     var arr = JSON.parse(response).results;
@@ -77,14 +70,39 @@ function taulukkoKone(response) {
     out += "</table>";
     document.getElementById("datakentta").innerHTML = out;
 }
-function btn_nextResults() {
-alert("seuraava nappulaa painettu");
+
+// Funktiot sivun alalaidan nappuloille
+    
+function btn_nextResults(response) {  
+resultsFromCount = resultsFromCount + 20;    
+taulukkoKone(xmlhttp.responseText);
+xmlhttp.open("GET", urlGenerator(), true);
+xmlhttp.send();   
+  
 }
 function btn_prevResults() {
-alert("edellinen nappulaa painettu");    
+if (resultsFromCount >= 20){   
+resultsFromCount = resultsFromCount - 20;
+taulukkoKone(xmlhttp.responseText);
+xmlhttp.open("GET", urlGenerator(), true);
+xmlhttp.send();    
 }
-  
+else { 
+alert("Olet ensimmaisella sivulla");
     
+}    
+}
+    
+//URL generaattori     
+function urlGenerator(url){ 
+var totalResults= false;    
+var maxResults = 20;
+var companyRegistrationFrom = "2016-05-01";
+var companyRegistrationTo = "2016-05-31";    
+var url = "http://avoindata.prh.fi:80/tr/v1?totalResults="+totalResults+"&maxResults="+maxResults+"&resultsFrom="+resultsFromCount+"&companyRegistrationFrom="+companyRegistrationFrom+"&companyRegistrationTo="+companyRegistrationTo;
+return url;    
+}
+        
 </script> 
 </body>
 </html>
